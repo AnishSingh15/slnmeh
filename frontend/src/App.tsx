@@ -1,17 +1,27 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import type { AuctionInfo, Meta } from "./api/client";
 import { useMeta } from "./api/hooks";
 import { AuctionSelect } from "./components/AuctionSelect";
 import { ErrorState, Loading } from "./components/States";
-import { AccuracyView } from "./features/accuracy/AccuracyView";
-import { DeliveryDayView } from "./features/delivery-day/DeliveryDayView";
 import { MethodPanel } from "./features/method/MethodPanel";
 import { setSearchParams, useSearchParam } from "./lib/url-state";
+
+// Chart-heavy views load on demand, so each tab only downloads what it renders.
+const DeliveryDayView = lazy(() =>
+  import("./features/delivery-day/DeliveryDayView").then((m) => ({ default: m.DeliveryDayView })),
+);
+const AccuracyView = lazy(() =>
+  import("./features/accuracy/AccuracyView").then((m) => ({ default: m.AccuracyView })),
+);
+const LeadTimeView = lazy(() =>
+  import("./features/lead-time/LeadTimeView").then((m) => ({ default: m.LeadTimeView })),
+);
 
 // Tabs are added as views are built; the first entry is the landing view.
 const TABS = [
   { id: "day", label: "Delivery day" },
   { id: "accuracy", label: "Accuracy" },
+  { id: "lead-time", label: "Lead-time explorer" },
   { id: "method", label: "Method & data" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
@@ -50,14 +60,17 @@ export default function App() {
       }
       nav={<TabNav current={tab} />}
     >
-      {tab === "day" && <DeliveryDayView meta={meta.data} auction={auction} />}
-      {tab === "accuracy" && (
-        <AccuracyView
-          auction={auction}
-          onOpenDay={(date) => setSearchParams({ tab: "day", date })}
-        />
-      )}
-      {tab === "method" && <MethodPanel meta={meta.data} />}
+      <Suspense fallback={<Loading />}>
+        {tab === "day" && <DeliveryDayView meta={meta.data} auction={auction} />}
+        {tab === "accuracy" && (
+          <AccuracyView
+            auction={auction}
+            onOpenDay={(date) => setSearchParams({ tab: "day", date })}
+          />
+        )}
+        {tab === "lead-time" && <LeadTimeView meta={meta.data} />}
+        {tab === "method" && <MethodPanel meta={meta.data} />}
+      </Suspense>
     </Layout>
   );
 }

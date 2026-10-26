@@ -1,4 +1,4 @@
-import type { Accuracy, AuctionInfo, DeliveryDay, Meta } from "../api/client";
+import type { Accuracy, AuctionInfo, DeliveryDay, LeadTime, Meta } from "../api/client";
 
 export const epex: AuctionInfo = {
   id: "epex_60",
@@ -129,4 +129,27 @@ export const accuracy: Accuracy = {
   series: [
     { start_time: "2026-01-01T23:00:00Z", forecast_mw: 12000, p50_mw: 10500, actual_mw: 10000 },
   ],
+};
+
+export const leadTime: LeadTime = {
+  hours_ahead: 4,
+  start: "2026-01-02",
+  end: "2026-01-03",
+  points: [
+    {
+      start_time: "2026-01-01T23:00:00Z",
+      forecast_mw: 11000,
+      publish_time: "2026-01-01T18:30:00Z",
+      actual_mw: 10000,
+    },
+  ],
+  summary: {
+    n: 1,
+    mae_mw: 1000,
+    rmse_mw: 1000,
+    bias_mw: 1000,
+    nmae: 0.1,
+    p90_abs_error_mw: 1000,
+    share_over_forecast: 1,
+  },
 };
