@@ -271,8 +271,9 @@ slice cached frames.
   installs the backend, copies the built assets, runs as a non-root user, binds to `$PORT`,
   and has a healthcheck.
 - **docker-compose.yml**: local development with backend and frontend hot reload.
-- **Heroku** (container stack, `heroku.yml`): deploys the same image. Basic dyno, which does
-  not sleep, so the first visit is not a cold start.
+- **Vercel** (Container preset): builds and runs the same image on every push to `main`,
+  with `PORT=8000` set in the project. Instances scale to zero when idle, so the first visit
+  after a quiet period starts the container (a few seconds); the snapshot loads at startup.
 
 ---
 

@@ -5,7 +5,7 @@ actually had when the auction closed**, **how wrong that forecast turned out to 
 to adjust for the error**. It uses only Elexon BMRS national wind data and covers purchase
 decisions made in January 2026.
 
-**Live app:** __HEROKU_URL__ · **Video:** __VIDEO_URL__ · **Design doc:** [docs/design.md](docs/design.md)
+**Live app:** [slnmeh.vercel.app](https://slnmeh.vercel.app) · **Video:** __VIDEO_URL__ · **Design doc:** [docs/design.md](docs/design.md)
 
 ![WindDesk delivery-day view for 12 January 2026](docs/screenshot.png)
 
@@ -91,7 +91,7 @@ Or with Docker only: `docker compose --profile dev up api web` → http://localh
 | `frontend/src/lib/`, `frontend/src/components/` | Formatting (UK time), URL state, CSV, chart helpers; shared UI |
 | `frontend/openapi.json` | API schema exported from the backend; source of the TypeScript types |
 | `docs/design.md` | Product and technical design, assumptions and limitations |
-| `Dockerfile`, `docker-compose.yml`, `heroku.yml` | Production image, local run/dev, Heroku deploy |
+| `Dockerfile`, `docker-compose.yml` | Production image (also what Vercel deploys), local run/dev |
 | `Makefile`, `.github/workflows/ci.yml` | Common tasks; CI |
 
 ## Architecture
@@ -122,16 +122,14 @@ Interactive API docs are at `/docs` on any running instance.
   written prototype.
 - The frontend's TypeScript types are generated from the FastAPI OpenAPI schema; CI fails if they drift.
 - CI runs lint, types and tests for both halves, the contract check, and a Docker build with a smoke test.
-- One multi-stage, non-root Docker image runs locally, in CI and on Heroku.
+- One multi-stage, non-root Docker image runs locally, in CI and on Vercel.
 
 ## Deployment
 
-Heroku container stack: `heroku.yml` builds the `Dockerfile`, and the app binds to `$PORT`.
-
-```bash
-heroku create <app> --stack container
-git push heroku main
-```
+Vercel (Container preset) builds the root `Dockerfile` on every push to `main` and serves it at
+[slnmeh.vercel.app](https://slnmeh.vercel.app). Project settings: root directory = repository
+root, environment variable `PORT=8000` (the port the image listens on). The same image runs
+anywhere that accepts a container and sets `$PORT`.
 
 ## Assumptions and limitations
 
