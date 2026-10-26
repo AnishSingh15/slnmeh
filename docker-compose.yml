@@ -1,0 +1,32 @@
+# Run the production image:   docker compose up --build                -> http://localhost:8000
+# Develop with hot reload:    docker compose --profile dev up api web  -> http://localhost:5173
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+
+  api:
+    profiles: ["dev"]
+    image: ghcr.io/astral-sh/uv:0.12.5-python3.12-trixie-slim
+    working_dir: /app/backend
+    environment:
+      WINDDESK_DATA_DIR: /app/data/snapshot
+      UV_LINK_MODE: copy
+      UV_PROJECT_ENVIRONMENT: /venv
+    volumes: [".:/app", "api-venv:/venv"]
+    command: uv run --frozen --no-dev uvicorn --factory winddesk.main:create_app --host 0.0.0.0 --port 8000 --reload
+
+  web:
+    profiles: ["dev"]
+    image: node:24-alpine
+    working_dir: /app/frontend
+    environment:
+      VITE_API_PROXY: http://api:8000
+    volumes: ["./frontend:/app/frontend", "web-node-modules:/app/frontend/node_modules"]
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    ports: ["5173:5173"]
+    depends_on: [api]
+
+volumes:
+  api-venv:
+  web-node-modules:
