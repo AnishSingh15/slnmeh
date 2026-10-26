@@ -16,4 +16,11 @@ describe("LeadTimeView", () => {
       expect(fetchSpy.mock.calls.some(([url]) => String(url).includes("hours=24"))).toBe(true),
     );
   });
+
+  it("explains when no forecast run reaches the chosen lead time", async () => {
+    mockFetch({ "/api/lead-time": { ...leadTime, hours_ahead: 48, summary: null } });
+    renderWithQuery(<LeadTimeView meta={meta} />);
+    expect(await screen.findByText(/No forecast run reaches 48 h ahead/)).toBeInTheDocument();
+    expect(screen.queryByText("Hours compared")).not.toBeInTheDocument();
+  });
 });

@@ -85,16 +85,22 @@ export function LeadTimeView({ meta }: { meta: Meta }) {
         <Loading />
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+      ) : !query.data.summary ? (
+        // WINDFOR runs extend about 47 h, so the longest lead times can have no data at all.
+        <Card title="No data at this lead time">
+          <p className="text-sm text-slate-600">
+            No forecast run reaches {query.data.hours_ahead} h ahead in this window. WINDFOR runs
+            cover roughly the next 47 hours; choose a shorter lead time.
+          </p>
+        </Card>
       ) : (
         <>
-          {query.data.summary && (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              <KpiCard label="MAE" value={formatGW(query.data.summary.mae_mw)} />
-              <KpiCard label="RMSE" value={formatGW(query.data.summary.rmse_mw)} />
-              <KpiCard label="Bias" value={formatSignedGW(query.data.summary.bias_mw)} />
-              <KpiCard label="Hours compared" value={String(query.data.summary.n)} />
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <KpiCard label="MAE" value={formatGW(query.data.summary.mae_mw)} />
+            <KpiCard label="RMSE" value={formatGW(query.data.summary.rmse_mw)} />
+            <KpiCard label="Bias" value={formatSignedGW(query.data.summary.bias_mw)} />
+            <KpiCard label="Hours compared" value={String(query.data.summary.n)} />
+          </div>
           <Card title={`Actual vs forecast published at least ${query.data.hours_ahead} h ahead`}>
             <ResponsiveContainer width="100%" height={320}>
               <LineChart

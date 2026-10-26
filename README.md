@@ -15,7 +15,7 @@ decisions made in January 2026.
 |---|---|
 | **Delivery day** | What forecast did I have at gate closure, and how did the day turn out? Forecast vs actual, calibrated P50 with P10–P90 band, runs published after the decision, hourly table with CSV export. |
 | **Accuracy** | How far can I trust the forecast, and how should I adjust? Raw vs calibrated metrics, error by lead time, hour of day, wind level and delivery day. |
-| **Lead-time explorer** | How does accuracy change if the forecast must be at least *H* hours old (0–48 h)? |
+| **Lead-time explorer** | How does accuracy change if the forecast must be at least *H* hours old (0–48 h; WINDFOR runs reach about 47 h)? |
 | **Method & data** | Definitions, assumptions, caveats and data completeness. |
 
 An **auction selector** (EPEX 60-min 09:20, N2EX 09:50, EPEX 30-min 15:30, UK time on D−1)
