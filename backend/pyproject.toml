@@ -21,6 +21,7 @@ dev = [
     "ruff>=0.8",
     "mypy>=1.13",
     "pandas-stubs>=2.2,<3",
+    "httpx2>=2.16",
 ]
 
 [tool.uv]

@@ -1,0 +1,1061 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "WindDesk API",
+    "description": "Day-ahead wind forecast intelligence for GB electricity trading.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/meta": {
+      "get": {
+        "summary": "Meta",
+        "operationId": "meta_api_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/delivery-day": {
+      "get": {
+        "summary": "Delivery Day",
+        "operationId": "delivery_day_api_delivery_day_get",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Delivery day (YYYY-MM-DD)",
+              "title": "Date"
+            },
+            "description": "Delivery day (YYYY-MM-DD)"
+          },
+          {
+            "name": "auction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "epex_60",
+                "n2ex_60",
+                "epex_30"
+              ],
+              "type": "string",
+              "description": "Auction whose gate closure is the decision cutoff",
+              "default": "epex_60",
+              "title": "Auction"
+            },
+            "description": "Auction whose gate closure is the decision cutoff"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryDayResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accuracy": {
+      "get": {
+        "summary": "Accuracy",
+        "operationId": "accuracy_api_accuracy_get",
+        "parameters": [
+          {
+            "name": "auction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "epex_60",
+                "n2ex_60",
+                "epex_30"
+              ],
+              "type": "string",
+              "description": "Auction whose gate closure is the decision cutoff",
+              "default": "epex_60",
+              "title": "Auction"
+            },
+            "description": "Auction whose gate closure is the decision cutoff"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccuracyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lead-time": {
+      "get": {
+        "summary": "Lead Time",
+        "operationId": "lead_time_api_lead_time_get",
+        "parameters": [
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 48,
+              "minimum": 0,
+              "description": "Minimum lead time",
+              "default": 4,
+              "title": "Hours"
+            },
+            "description": "Minimum lead time"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First delivery day",
+              "title": "Start"
+            },
+            "description": "First delivery day"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last delivery day",
+              "title": "End"
+            },
+            "description": "Last delivery day"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadTimeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccuracyResponse": {
+        "properties": {
+          "auction": {
+            "$ref": "#/components/schemas/AuctionInfo"
+          },
+          "raw": {
+            "$ref": "#/components/schemas/ErrorSummaryModel"
+          },
+          "calibrated": {
+            "$ref": "#/components/schemas/ErrorSummaryModel"
+          },
+          "band_coverage": {
+            "type": "number",
+            "title": "Band Coverage"
+          },
+          "calibration": {
+            "$ref": "#/components/schemas/CalibrationInfo"
+          },
+          "decision_lead_hours_min": {
+            "type": "number",
+            "title": "Decision Lead Hours Min"
+          },
+          "decision_lead_hours_max": {
+            "type": "number",
+            "title": "Decision Lead Hours Max"
+          },
+          "by_lead_time": {
+            "items": {
+              "$ref": "#/components/schemas/GroupStat"
+            },
+            "type": "array",
+            "title": "By Lead Time"
+          },
+          "by_hour": {
+            "items": {
+              "$ref": "#/components/schemas/GroupStat"
+            },
+            "type": "array",
+            "title": "By Hour"
+          },
+          "by_level": {
+            "items": {
+              "$ref": "#/components/schemas/GroupStat"
+            },
+            "type": "array",
+            "title": "By Level"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/GroupStat"
+            },
+            "type": "array",
+            "title": "Daily"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/SeriesRow"
+            },
+            "type": "array",
+            "title": "Series"
+          }
+        },
+        "type": "object",
+        "required": [
+          "auction",
+          "raw",
+          "calibrated",
+          "band_coverage",
+          "calibration",
+          "decision_lead_hours_min",
+          "decision_lead_hours_max",
+          "by_lead_time",
+          "by_hour",
+          "by_level",
+          "daily",
+          "series"
+        ],
+        "title": "AccuracyResponse"
+      },
+      "AuctionInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "epex_60",
+              "n2ex_60",
+              "epex_30"
+            ],
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue"
+          },
+          "gate_closure": {
+            "type": "string",
+            "title": "Gate Closure"
+          },
+          "product_minutes": {
+            "type": "integer",
+            "title": "Product Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "venue",
+          "gate_closure",
+          "product_minutes"
+        ],
+        "title": "AuctionInfo"
+      },
+      "CalibrationInfo": {
+        "properties": {
+          "intercept_mw": {
+            "type": "number",
+            "title": "Intercept Mw"
+          },
+          "slope": {
+            "type": "number",
+            "title": "Slope"
+          },
+          "p10_offset_mw": {
+            "type": "number",
+            "title": "P10 Offset Mw"
+          },
+          "p50_offset_mw": {
+            "type": "number",
+            "title": "P50 Offset Mw"
+          },
+          "p90_offset_mw": {
+            "type": "number",
+            "title": "P90 Offset Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intercept_mw",
+          "slope",
+          "p10_offset_mw",
+          "p50_offset_mw",
+          "p90_offset_mw"
+        ],
+        "title": "CalibrationInfo"
+      },
+      "DataInfo": {
+        "properties": {
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "actual_half_hours_expected": {
+            "type": "integer",
+            "title": "Actual Half Hours Expected"
+          },
+          "actual_half_hours_present": {
+            "type": "integer",
+            "title": "Actual Half Hours Present"
+          },
+          "forecast_rows": {
+            "type": "integer",
+            "title": "Forecast Rows"
+          },
+          "forecast_rows_valid": {
+            "type": "integer",
+            "title": "Forecast Rows Valid"
+          },
+          "forecast_runs": {
+            "type": "integer",
+            "title": "Forecast Runs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fetched_at",
+          "source",
+          "actual_half_hours_expected",
+          "actual_half_hours_present",
+          "forecast_rows",
+          "forecast_rows_valid",
+          "forecast_runs"
+        ],
+        "title": "DataInfo"
+      },
+      "DaySummary": {
+        "properties": {
+          "hours_compared": {
+            "type": "integer",
+            "title": "Hours Compared"
+          },
+          "forecast_gwh": {
+            "type": "number",
+            "title": "Forecast Gwh"
+          },
+          "actual_gwh": {
+            "type": "number",
+            "title": "Actual Gwh"
+          },
+          "error_gwh": {
+            "type": "number",
+            "title": "Error Gwh"
+          },
+          "error_pct": {
+            "type": "number",
+            "title": "Error Pct"
+          },
+          "mae_mw": {
+            "type": "number",
+            "title": "Mae Mw"
+          },
+          "largest_miss_mw": {
+            "type": "number",
+            "title": "Largest Miss Mw"
+          },
+          "largest_miss_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Largest Miss At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hours_compared",
+          "forecast_gwh",
+          "actual_gwh",
+          "error_gwh",
+          "error_pct",
+          "mae_mw",
+          "largest_miss_mw",
+          "largest_miss_at"
+        ],
+        "title": "DaySummary"
+      },
+      "Decision": {
+        "properties": {
+          "cutoff": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cutoff"
+          },
+          "runs_used": {
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": "array",
+            "title": "Runs Used"
+          },
+          "lead_hours_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Hours Min"
+          },
+          "lead_hours_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Hours Max"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cutoff",
+          "runs_used",
+          "lead_hours_min",
+          "lead_hours_max"
+        ],
+        "title": "Decision"
+      },
+      "DeliveryDayResponse": {
+        "properties": {
+          "delivery_day": {
+            "type": "string",
+            "format": "date",
+            "title": "Delivery Day"
+          },
+          "auction": {
+            "$ref": "#/components/schemas/AuctionInfo"
+          },
+          "window_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Window Start"
+          },
+          "window_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Window End"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/HourRow"
+            },
+            "type": "array",
+            "title": "Hours"
+          },
+          "actuals_half_hourly": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "Actuals Half Hourly"
+          },
+          "later_runs": {
+            "items": {
+              "$ref": "#/components/schemas/Run"
+            },
+            "type": "array",
+            "title": "Later Runs"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DaySummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "delivery_day",
+          "auction",
+          "window_start",
+          "window_end",
+          "decision",
+          "hours",
+          "actuals_half_hourly",
+          "later_runs",
+          "summary"
+        ],
+        "title": "DeliveryDayResponse"
+      },
+      "ErrorSummaryModel": {
+        "properties": {
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "mae_mw": {
+            "type": "number",
+            "title": "Mae Mw"
+          },
+          "rmse_mw": {
+            "type": "number",
+            "title": "Rmse Mw"
+          },
+          "bias_mw": {
+            "type": "number",
+            "title": "Bias Mw"
+          },
+          "nmae": {
+            "type": "number",
+            "title": "Nmae"
+          },
+          "p90_abs_error_mw": {
+            "type": "number",
+            "title": "P90 Abs Error Mw"
+          },
+          "share_over_forecast": {
+            "type": "number",
+            "title": "Share Over Forecast"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n",
+          "mae_mw",
+          "rmse_mw",
+          "bias_mw",
+          "nmae",
+          "p90_abs_error_mw",
+          "share_over_forecast"
+        ],
+        "title": "ErrorSummaryModel"
+      },
+      "GroupStat": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "mae_mw": {
+            "type": "number",
+            "title": "Mae Mw"
+          },
+          "bias_mw": {
+            "type": "number",
+            "title": "Bias Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "n",
+          "mae_mw",
+          "bias_mw"
+        ],
+        "title": "GroupStat"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "data_fetched_at": {
+            "type": "string",
+            "title": "Data Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "data_fetched_at"
+        ],
+        "title": "HealthResponse"
+      },
+      "HourRow": {
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Mw"
+          },
+          "p10_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P10 Mw"
+          },
+          "p50_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Mw"
+          },
+          "p90_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90 Mw"
+          },
+          "actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Mw"
+          },
+          "error_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "forecast_mw",
+          "p10_mw",
+          "p50_mw",
+          "p90_mw",
+          "actual_mw",
+          "error_mw"
+        ],
+        "title": "HourRow"
+      },
+      "LeadTimePoint": {
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Mw"
+          },
+          "publish_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish Time"
+          },
+          "actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "forecast_mw",
+          "publish_time",
+          "actual_mw"
+        ],
+        "title": "LeadTimePoint"
+      },
+      "LeadTimeResponse": {
+        "properties": {
+          "hours_ahead": {
+            "type": "integer",
+            "title": "Hours Ahead"
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/LeadTimePoint"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorSummaryModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "hours_ahead",
+          "start",
+          "end",
+          "points",
+          "summary"
+        ],
+        "title": "LeadTimeResponse"
+      },
+      "MetaResponse": {
+        "properties": {
+          "auctions": {
+            "items": {
+              "$ref": "#/components/schemas/AuctionInfo"
+            },
+            "type": "array",
+            "title": "Auctions"
+          },
+          "default_auction": {
+            "type": "string",
+            "enum": [
+              "epex_60",
+              "n2ex_60",
+              "epex_30"
+            ],
+            "title": "Default Auction"
+          },
+          "delivery_days": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "title": "Delivery Days"
+          },
+          "window_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Window Start"
+          },
+          "window_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Window End"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DataInfo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "auctions",
+          "default_auction",
+          "delivery_days",
+          "window_start",
+          "window_end",
+          "data"
+        ],
+        "title": "MetaResponse"
+      },
+      "Point": {
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "mw": {
+            "type": "number",
+            "title": "Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "mw"
+        ],
+        "title": "Point"
+      },
+      "Run": {
+        "properties": {
+          "publish_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publish Time"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "publish_time",
+          "points"
+        ],
+        "title": "Run"
+      },
+      "SeriesRow": {
+        "properties": {
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "forecast_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast Mw"
+          },
+          "p50_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Mw"
+          },
+          "actual_mw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Mw"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start_time",
+          "forecast_mw",
+          "p50_mw",
+          "actual_mw"
+        ],
+        "title": "SeriesRow"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
