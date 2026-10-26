@@ -26,3 +26,18 @@ export function hourTicks(startIso: string, endIso: string, stepHours: number): 
   }
   return ticks;
 }
+
+const STEPS_MW = [250, 500, 1000, 2000, 2500, 5000, 10000];
+
+/** Axis domain and ticks on round GW steps (at most ~6 intervals) covering `values`. */
+export function gwAxis(values: number[]): { domain: [number, number]; ticks: number[] } {
+  const finite = values.filter(Number.isFinite);
+  const lo = Math.min(0, ...finite);
+  const hi = Math.max(0, ...finite);
+  const step = STEPS_MW.find((s) => (hi - lo) / s <= 6) ?? STEPS_MW[STEPS_MW.length - 1]!;
+  const min = Math.floor(lo / step) * step;
+  const max = Math.max(step, Math.ceil(hi / step) * step);
+  const ticks: number[] = [];
+  for (let t = min; t <= max; t += step) ticks.push(t);
+  return { domain: [min, max], ticks };
+}

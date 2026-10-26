@@ -3,6 +3,7 @@ import type { AuctionInfo, Meta } from "./api/client";
 import { useMeta } from "./api/hooks";
 import { AuctionSelect } from "./components/AuctionSelect";
 import { ErrorState, Loading } from "./components/States";
+import { AccuracyView } from "./features/accuracy/AccuracyView";
 import { DeliveryDayView } from "./features/delivery-day/DeliveryDayView";
 import { MethodPanel } from "./features/method/MethodPanel";
 import { setSearchParams, useSearchParam } from "./lib/url-state";
@@ -10,6 +11,7 @@ import { setSearchParams, useSearchParam } from "./lib/url-state";
 // Tabs are added as views are built; the first entry is the landing view.
 const TABS = [
   { id: "day", label: "Delivery day" },
+  { id: "accuracy", label: "Accuracy" },
   { id: "method", label: "Method & data" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
@@ -49,6 +51,12 @@ export default function App() {
       nav={<TabNav current={tab} />}
     >
       {tab === "day" && <DeliveryDayView meta={meta.data} auction={auction} />}
+      {tab === "accuracy" && (
+        <AccuracyView
+          auction={auction}
+          onOpenDay={(date) => setSearchParams({ tab: "day", date })}
+        />
+      )}
       {tab === "method" && <MethodPanel meta={meta.data} />}
     </Layout>
   );
