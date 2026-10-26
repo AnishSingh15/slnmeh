@@ -107,7 +107,7 @@ From the pilot data, auction `epex_60`, 744 delivery hours:
 | Bias by forecast level | ≈ +0.8 GW below 6 GW forecast; ≈ +2.5 GW above 14 GW |
 | Calibrated P50, leave-one-day-out MAE | ≈ 1.21 GW (≈ 40% lower) |
 | P10–P90 band coverage, out-of-sample | ≈ 78% (nominal 80%) |
-| MAE by lead time, all runs | ≈ 1.8 GW at 0–4 h → ≈ 2.4 GW at 44–48 h |
+| MAE by lead time, all runs | ≈ 1.7 GW at 0–4 h → ≈ 2.4 GW at 44–48 h |
 | Largest daily MAE (delivery day) | 28 Jan, 12 Jan, 11 Jan |
 
 The over-forecast growing with wind level is consistent with transmission-constraint
