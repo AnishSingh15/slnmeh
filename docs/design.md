@@ -205,7 +205,7 @@ Elexon BMRS API ──(ingest CLI)──▶ data/snapshot/{actuals,forecasts}.cs
 | `ingest/elexon.py` | HTTP client for both stream endpoints: retries, timeouts, schema validation |
 | `ingest/__main__.py` | `python -m winddesk.ingest` → writes snapshot + manifest |
 | `repository.py` | Loads the snapshot into typed DataFrames once |
-| `domain/time.py` | Delivery-day window and gate-closure instants (zoneinfo, DST-safe) |
+| `domain/delivery.py` | Delivery-day window and gate-closure instants (zoneinfo, DST-safe) |
 | `domain/selection.py` | Forecast available at a cutoff; fixed-lead-time selection; valid-point filter |
 | `domain/alignment.py` | Half-hourly actuals → hourly means |
 | `domain/calibration.py` | Linear calibration, residual quantiles, leave-one-day-out predictions |
@@ -213,6 +213,7 @@ Elexon BMRS API ──(ingest CLI)──▶ data/snapshot/{actuals,forecasts}.cs
 | `service.py` | Builds and caches per-auction datasets at startup; assembles view models |
 | `api/schemas.py`, `api/routes.py` | Pydantic response models and routes |
 | `main.py` | App factory; mounts the API and serves the built frontend |
+| `openapi.py` | Exports the OpenAPI schema used to generate the frontend's TypeScript types |
 
 Domain functions take and return plain data (DataFrames / dataclasses), with no I/O, so they
 can be tested in isolation.
@@ -233,7 +234,7 @@ pilot window, `hours` outside 0–48) return `422` with a clear message.
 Responses are gzip-compressed. Per-auction datasets are computed at startup, so requests only
 slice cached frames.
 
-### 4.4 Frontend (`frontend/`, React 18, TypeScript strict, Vite)
+### 4.4 Frontend (`frontend/`, React 19, TypeScript 5.9 strict, Vite)
 
 - `src/api/` — typed client; types **generated from the FastAPI OpenAPI schema**
   (`openapi-typescript`) so the contract cannot drift.
@@ -247,7 +248,7 @@ slice cached frames.
 ## 5. Quality
 
 - **Backend tests (pytest)**
-  - `time`: delivery window and gate closure, including a clock-change day.
+  - `delivery`: delivery window and gate closure, including clock-change days.
   - `selection`: never selects a run published after the cutoff; excludes negative-lead
     points; handles a late run and a missing run; fixed-lead-time respects the 48 h cap.
   - `alignment` and `metrics`: hand-computed expected values; missing half-hour excludes the hour.
