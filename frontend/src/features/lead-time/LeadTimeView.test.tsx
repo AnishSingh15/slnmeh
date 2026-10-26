@@ -20,7 +20,7 @@ describe("LeadTimeView", () => {
   it("explains when no forecast run reaches the chosen lead time", async () => {
     mockFetch({ "/api/lead-time": { ...leadTime, hours_ahead: 48, summary: null } });
     renderWithQuery(<LeadTimeView meta={meta} />);
-    expect(await screen.findByText(/No forecast run reaches 48 h ahead/)).toBeInTheDocument();
+    expect(await screen.findByText(/No forecast point is at least 48 h ahead/)).toBeInTheDocument();
     expect(screen.queryByText("Hours compared")).not.toBeInTheDocument();
   });
 });

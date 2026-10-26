@@ -86,11 +86,12 @@ export function LeadTimeView({ meta }: { meta: Meta }) {
       ) : query.isError ? (
         <ErrorState error={query.error} onRetry={() => void query.refetch()} />
       ) : !query.data.summary ? (
-        // WINDFOR runs extend about 47 h, so the longest lead times can have no data at all.
+        // Points more than 48 h ahead are excluded and runs publish at :30, so 48 h selects nothing.
         <Card title="No data at this lead time">
           <p className="text-sm text-slate-600">
-            No forecast run reaches {query.data.hours_ahead} h ahead in this window. WINDFOR runs
-            cover roughly the next 47 hours; choose a shorter lead time.
+            No forecast point is at least {query.data.hours_ahead} h ahead within the
+            explorer&apos;s 48-hour limit (WINDFOR runs are published at half past the hour). Choose
+            a shorter lead time.
           </p>
         </Card>
       ) : (
